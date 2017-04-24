@@ -27,16 +27,17 @@
 		</div>
 		
 		
+		<!------------------------------ Signup ----------------------------------->
 		<div>
 		
 			Username: <input type="text" id="input_userName"> </br>
 			Age: <input type="text" id="input_age"> </br>
 			State: 
-			<select>
+			<select id = select_state>
   				<option value="1">Hawaii</option>
   				<option value="2">California</option>
   			</select> </br>
-			<select>
+			<select id = select_role>
   				<option value="0">Owner</option>
   				<option value="1">Customer</option>
   			</select> </br>
