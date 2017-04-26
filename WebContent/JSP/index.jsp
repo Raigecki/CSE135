@@ -41,9 +41,15 @@
   				<option value="0">Owner</option>
   				<option value="1">Customer</option>
   			</select> </br>
-			<button type="button" class="btn" id="btn_signUp">Submit</button>
+			<button type="button" class="btn" id="btn_signUp" onClick="createUser()">Submit</button>
 			
 		</div>
+	</div>
+	
+	<!--------------------------------Messages------------------------------------>
+	<div>
+	
+		<h4 id="text_errorMsg"></h4>
 	</div>
 
 </body>
