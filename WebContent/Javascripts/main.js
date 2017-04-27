@@ -16,7 +16,7 @@ function createUser() {
 	var info = [username, age, state, role];
 	
 	var sReq = new XMLHttpRequest();
-	sReq.open('POST', 'Controller_SignUp.java');
+	sReq.open('POST', 'ApplicationControls/Controller_SignUp.java');
 	s.Req.send(info);
 
     sReq.onreadystatechange = function() {

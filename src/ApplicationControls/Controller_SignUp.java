@@ -12,8 +12,11 @@ public class Controller_SignUp {
 	public boolean createUser(String userInfo[]) throws SQLException, ClassNotFoundException {
 		Class.forName("org.postgresql.Driver");
 		
+		System.out.println(userInfo[0]);
+		
 		// open a connection to the database
-		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/jdbc-examples?" + "user=cse135&password=sheevspin");
+		//Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/jdbc-examples?" + "user=cse135&password=sheevspin");
+		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135","postgres", "$$JBlue");
 		
 		String name = userInfo[0];
 		int age = Integer.parseInt(userInfo[1]);
