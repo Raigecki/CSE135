@@ -17,7 +17,7 @@
 
 		<div class="container_inner">
 
-			<form method="get" action="../Java Resources/src/ApplicationControls/Servlet_CheckLogin">
+			<form method="get" action="./Servlet_LoginCheck">
 
 				Username: <input type="text" name="tb_username">
 				
