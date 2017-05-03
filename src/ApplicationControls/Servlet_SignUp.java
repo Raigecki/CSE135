@@ -65,7 +65,7 @@ public class Servlet_SignUp extends HttpServlet {
 
 			conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135", "postgres", "$$JBlue");
 
-			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name FROM foooo WHERE name =?");
+			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name FROM usert WHERE name =?");
 
 			verifyStmt.setString(1, user);
 
@@ -103,13 +103,14 @@ public class Servlet_SignUp extends HttpServlet {
 			//Case when sign up is successful
 			else if (username == false) {
 				
-				PreparedStatement postStmt = conn.prepareStatement("INSERT INTO foooo (name, age, state, role)"
-						+ "VALUES (?, ?, ?, ?");
+				PreparedStatement postStmt = conn.prepareStatement("INSERT INTO usert (name, age, state, role)"
+						+ "VALUES (?, ?, ?, ?)");
 				
 				postStmt.setString(1, user);
-				verifyStmt.setInt(2,age);
-				verifyStmt.setInt(3, state);
-				verifyStmt.setInt(4, role);
+				postStmt.setInt(2,age);
+				postStmt.setInt(3, state);
+				postStmt.setInt(4, role);
+				postStmt.executeQuery();
 				response.sendRedirect("Success_SignUp.jsp");
 			}
 
