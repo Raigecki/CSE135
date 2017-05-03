@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ public class Servlet_LoginCheck extends HttpServlet {
 			
 			conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135","postgres", "$$JBlue");
 			
-			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name FROM user WHERE name =?");
+			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name, role FROM foooo WHERE name =?");
 			
 			verifyStmt.setString(1, user);
 			
@@ -55,6 +56,8 @@ public class Servlet_LoginCheck extends HttpServlet {
 			
 			if (result.next()) {
 				
+				int role = result.getInt("ROLE");
+				((ServletRequest) response).setAttribute("role", role);
 				response.sendRedirect("Home.html");
 			}
 			else {

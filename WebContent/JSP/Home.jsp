@@ -8,14 +8,25 @@
 </head>
 <body>
 
-	<h2>Welcome</h2> 
+	<%String user = request.getParameter("user"); 
+	  session.setAttribute("user", user);
+	  
+	  String role = request.getParameter("role");
+	  session.setAttribute("role", role);
+	%>
+
+	<h2>Welcome <%= user%></h2> 
 
 	<div>
-		<a href="Categories.jsp">Categories</a> </br>
-		<a href="Products.jsp">Products</a> </br>
-		<a href="Browse.jsp">Browse Products</a> </br>
-		<a href="Cart.jsp">Shopping Cart</a> </br>
-		<a href="Buy.jsp">Make Purchase</a> </br>
+	
+		<% if (Integer.parseInt(role) == 0) { %>
+			<a href="Categories.jsp">Categories</a> </br>
+			<a href="Products.jsp">Products</a> </br>
+		<% } else if (Integer.parseInt(role) == 1){ %>
+			<a href="Browse.jsp">Browse Products</a> </br>
+			<a href="Cart.jsp">Shopping Cart</a> </br>
+			<a href="Buy.jsp">Make Purchase</a> </br>
+		<% } %>
 	</div>
 
 </body>

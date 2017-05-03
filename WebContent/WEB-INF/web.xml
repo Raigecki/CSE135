@@ -10,6 +10,8 @@
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
   <display-name>CSE135</display-name>
+  
+  <!-- ////////////////////////Login Servlet////////////////////////////// -->
   <servlet>
     <servlet-name>Servlet_LoginCheck</servlet-name>
     <servlet-class>ApplicationControls/Servlet_LoginCheck</servlet-class>
@@ -17,5 +19,15 @@
   <servlet-mapping>
     <servlet-name>Servlet_LoginCheck</servlet-name>
     <url-pattern>/JSP/Servlet_LoginCheck</url-pattern>
+  </servlet-mapping>
+  
+  <!-- ///////////////////////Sign Up Servlet///////////////////////////// -->
+  <servlet>
+    <servlet-name>Servlet_SignUp</servlet-name>
+    <servlet-class>ApplicationControls/Servlet_SignUp</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet_SignUp</servlet-name>
+    <url-pattern>/JSP/Servlet_SignUp</url-pattern>
   </servlet-mapping>
 </web-app>
