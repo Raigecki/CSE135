@@ -13,21 +13,86 @@
 </head>
 <body>
 
+	<%@ page import="java.sql.*" %>
+	
 	<div class="container_outer">
 
 		<div class="container_inner">
 
-			<form method="get" action="./Servlet_LoginCheck">
+			<form method="get">
 
+				<input type="hidden" name="action" value="check">
 				Username: <input type="text" name="tb_username">
 				
 				</br> </br>
 				<input type="submit" id="btn_login_submit" value="Sign In" />
 			</form>
 		</div>
+		
+		
+		<!-- //////////////////////////////////////Connection Code/////////////////////////////////////////// -->
+		
+		<%
+		
+		String action = request.getParameter("action");
+		if (action != null && action.equals("check")) {
+			Connection conn;
+			try {
+				
+				String user = request.getParameter("tb_username");
+				System.out.println(user);
+				
+				Class.forName("org.postgresql.Driver");
+				
+				conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135","postgres", "$$JBlue");
+			
+		%>
+			
+		<!-- ////////////////////////////////////////Statement Code//////////////////////////////////////// -->
+		<% 
+			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name, role FROM usert WHERE name =?");
+			
+			verifyStmt.setString(1, user);
+			
+			ResultSet result = verifyStmt.executeQuery();
+			
+			boolean notNull = result.next();
+			
+			
+			if (notNull) {
+				
+				int role = result.getInt("role");
+				String name = result.getString("name");
+				System.out.println(role);
+				System.out.println(name);
+				
+				session.setAttribute("role", role);
+				session.setAttribute("user", name);
+				response.sendRedirect("Home.jsp");
+			}
+			else{ 
+		%>
+			
+			<h4 id="text_errorMsg">User name not found</h4>
+						
+		<% 
+				response.sendRedirect("index.jsp");
+			}
+		%>
+		
+		<%
+		
+			result.close();
+			verifyStmt.close();
+			conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		%>
 
-
-
-		<h4 id="text_errorMsg"></h4>
+		
+	</div>
 </body>
 </html>
