@@ -50,7 +50,7 @@
 			
 		<!-- ////////////////////////////////////////Statement Code//////////////////////////////////////// -->
 		<% 
-			PreparedStatement verifyStmt = conn.prepareStatement("SELECT name, role FROM usert WHERE name =?");
+			PreparedStatement verifyStmt = conn.prepareStatement("SELECT id, name, role FROM usert WHERE name =?");
 			
 			verifyStmt.setString(1, user);
 			
@@ -62,12 +62,15 @@
 			if (notNull) {
 				
 				int role = result.getInt("role");
+				int userid = result.getInt("id");
 				String name = result.getString("name");
-				System.out.println(role);
-				System.out.println(name);
+				System.out.println("role: " + role);
+				System.out.println("name: " + name);
+				System.out.println("userid: " + userid);
 				
 				session.setAttribute("role", role);
 				session.setAttribute("user", name);
+				session.setAttribute("userid", userid);
 				response.sendRedirect("Home.jsp");
 			}
 			else{ 
