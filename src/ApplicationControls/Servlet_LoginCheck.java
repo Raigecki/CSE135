@@ -54,13 +54,18 @@ public class Servlet_LoginCheck extends HttpServlet {
 			
 			ResultSet result = verifyStmt.executeQuery();
 			
-			if (result.next()) {
+			boolean isNull = result.next();
+			
+			
+			if (isNull == true) {
 				
 				int role = result.getInt("ROLE");
+				String name = result.getString("name");
 				((ServletRequest) response).setAttribute("role", role);
+				((ServletRequest) response).setAttribute("user", name);
 				response.sendRedirect("Home.html");
 			}
-			else {
+			else if (isNull == false) {
 				response.sendRedirect("Index.jsp");
 			}
 			
