@@ -44,7 +44,8 @@
 				
 				Class.forName("org.postgresql.Driver");
 				
-				conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135","postgres", "$$JBlue");
+				conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/CSE135",
+						"postgres", "$$JBlue");
 			
 		%>
 			
@@ -54,12 +55,9 @@
 			
 			verifyStmt.setString(1, user);
 			
-			ResultSet result = verifyStmt.executeQuery();
+			ResultSet result = verifyStmt.executeQuery();			
 			
-			boolean notNull = result.next();
-			
-			
-			if (notNull) {
+			if (result.next()) {
 				
 				int role = result.getInt("role");
 				int userid = result.getInt("id");
@@ -83,8 +81,8 @@
 			}
 		%>
 		
+	<!-- ///////////////////////////////////Close connection code/////////////////////////////////////// -->
 		<%
-		
 			result.close();
 			verifyStmt.close();
 			conn.close();

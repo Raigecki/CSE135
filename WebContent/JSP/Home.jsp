@@ -30,7 +30,8 @@
 		<% } else if (role == 1){ %>		
 			<a href="Browse.jsp">Browse Products</a> </br>
 			<a href="Cart.jsp">Shopping Cart</a> </br>
-			<a href="Buy.jsp">Make Purchase</a> </br>
+			<a href="Buy.jsp">Buy Shopping Cart</a>
+
 		<% } %>
 	</div>
 
