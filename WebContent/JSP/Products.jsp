@@ -46,6 +46,7 @@
  	            ResultSet rs = null;
  	            ResultSet rsTemp = null;
  	            ResultSet rsTemp2 = null;
+ 	            ResultSet searchResults = null;
  	            
  	            try {
  	                // Registering Postgresql JDBC driver with the DriverManager
@@ -181,93 +182,7 @@
 			
  	                }
  	            %>
- 	            <%-- -------- DISPLAY PRODUCTS BASED ON SEARCH PARAMETERS CODE -------- --%>
- 	            <%
- 	            	// check if we are to display products
- 	            	if (action != null && action.equals("display")) {
- 	            		// get search and display parameters
- 	            		String category = request.getParameter("categoryid");
- 	            		String searchString = request.getParameter("searchstring");
- 	            		
- 	 	                // Create the statement
- 	 	                Statement statement = conn.createStatement();
 
- 	 	                // Use the created statement to SELECT
- 	 	                if (category.equals("")) {
- 	 	                	rs = statement.executeQuery("SELECT * FROM product WHERE name LIKE %" + searchString + "%");
- 	 	                } else {
- 	 	                	rs = statement.executeQuery("SELECT * FROM product WHERE category = " + category + " AND name LIKE %" + searchString + "%");
- 	 	                }
- 	            	
- 	 	            %>
- 	 	            
- 	 	            <!-- Add an HTML table header row to format the results -->
- 	 	            <table border="1">
- 	 	            <tr>
- 	 	                <th>Name</th>
- 	 	                <th>Sku</th>
- 	 	                <th>Price</th>
- 	 	                <th>Category</th>
- 	 	            </tr>
-
- 	 	            <%-- -------- Iteration Code -------- --%>
- 	 	            <%
-						Statement stmt = null;
- 	 	                // Iterate over the ResultSet
- 	 	                while (rs.next()) {
- 	 	                	int id = rs.getInt("id");
- 	 	                	String name = rs.getString("name");
- 	 	                	String sku = rs.getString("sku");
- 	 	                	double price = rs.getDouble("price");
- 	 	                	int categoryid = rs.getInt("category");
- 	 	                	
- 	 	                	// get the category name (very helpful)
- 	 	                	String categoryName;
- 	 	 	            	rsTemp = stmt.executeQuery("SELECT name FROM category WHERE id = " + categoryid);
- 	 	 	            	rsTemp.next();
- 	 	 	            	categoryName = rsTemp.getString("name");
- 	 	 	            	
- 	 	 	            	// get all products under category
- 	 	 	            	stmt = conn.createStatement();
- 	 	 	            	rsTemp = stmt.executeQuery("SELECT * FROM category");
-
- 					%>
- 	 	            <tr>
- 	 	                <form action="./Products.jsp" method="POST">
- 	 	                    <input type="hidden" name="action" value="update"/>
- 	 	                    <td><input name="name" value="<%=name%>"/></td>
- 	 	                    <td><input name="sku" value="<%=sku%>"/></td>
- 	 	                    <td><input name="price" value="<%=price%>"/></td>
- 	 	                    <td><select name="category" selected="<%=categoryName%>">
- 	 	                    <%
- 	 	                    String tempName;
- 	 	                    while (rsTemp.next()) {
- 	 	                    	rsTemp2 = stmt.executeQuery("SELECT name FROM category WHERE id = " + rsTemp.getInt("id"));
- 	 	                    	rsTemp2.next();
- 	 	                    	tempName = rsTemp2.getString("name");
- 	 	                    %>
- 	 	                    	<option value=<%=categoryid%>><%=tempName%></option>
- 	 	                    <%
- 	 	                    }
- 	 	                    %>
- 	 	                    </select>
- 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
- 	 	                    
- 	 	                <%-- Button --%>
- 	 	                <td><input type="submit" value="Update"></td>
- 	 	                </form>
-
- 	 	                <form action="./Categories.jsp" method="POST">
- 	 	                    <input type="hidden" name="action" value="delete"/>
- 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
- 	 	                    <%-- Button --%>
- 	 	                <td><input type="submit" value="Delete"/></td>
- 	 	                </form>
- 	 	            </tr>
- 	 	            <%
- 	 	            	}
- 	            	}
- 	            	%>
 
  	            <%-- -------- DISPLAY INSERT FORM CODE -------- --%>
  	            
@@ -308,42 +223,145 @@
  	            </tr>
  	            </table>
  	            
+ 	             	                  
  	            <!-- SEARCH BAR STUFF -->
- 	            <table>
+				<table border="1">
  	            <tr>
- 	            	<td>
- 	            		<form action="./Products.jsp" method="POST">
- 	            		<input type="hidden" name="action" value="display"/>
- 	            		<input type="hidden" name="categoryid" value=""/>
- 	            		<input value="" name="searchstring" size="15"/>
- 	            		</form>
- 	            	</td>
- 	            	<td>
- 	            		<input type="submit" value="Display"/>
- 	            	<td>
+ 	                <th>Search</th>
+ 	            </tr>
+
+ 	            <tr>
+ 	                <form action="./Products.jsp" method="GET">
+ 	                    <input type="hidden" name="action" value="setSearchStringToDisplay"/>
+ 	                    <td><input value="" name="searchstring" size="15"/></td>
+ 	                    <td><input type="submit" value="Search"/></td>
+ 	                </form>
  	            </tr>
  	            </table>
- 	            	
  	            
- 	            <!-- Now populate the category list in href form. The search bar comes after
+ 	            <!--  CATEGORY LIST STUFF -->
  	            
- 	            
+ 	            <%
  	            Statement stmt = conn.createStatement();
- 	            rsTemp = stmt.executeQuery("SELECT * FROM category");
- 	            while (rsTemp.next()) {
- 	            	
- 	            	
+ 	            rsTemp2 = stmt.executeQuery("SELECT * from category");
+ 	            String hrefstring;
+ 	            while (rsTemp2.next()) {
+ 	            	hrefstring = "./Products.jsp?action=setCategoryToDisplay" + "&category=" + rsTemp2.getInt("id");
+ 	            %>
+ 	            	</br><a href=<%=hrefstring %>><%=rsTemp2.getString("name")%></a>	
+ 	            <%
+ 	            }
+ 	            %>
+
+ 	            <%-- -------- DISPLAY PRODUCTS BASED ON SEARCH PARAMETERS CODE -------- --%>
+ 	            <%
+ 	            if (action != null && action.equals("setCategoryToDisplay")) {
+ 	            	session.setAttribute("categoryToDisplay", request.getParameter("category"));
+ 	            	session.setAttribute("searchstring", null);
+ 	            	System.out.println("Category just got set to: " + (String) session.getAttribute("categoryToDisplay"));
+ 	            }
+ 	            if (action != null && action.equals("setSearchStringToDisplay")) {
+ 	            	if (request.getParameter("searchstring") != null) {
+ 	            		session.setAttribute("searchStringToDisplay", request.getParameter("searchstring"));
+ 	            	}
  	            }
  	            
--->
  	            
+ 	            String categoryFilter = (String) session.getAttribute("categoryToDisplay");
+ 	            String searchFilter = (String) session.getAttribute("searchStringToDisplay");
+ 	            if (categoryFilter != null || searchFilter != null) {
+ 	            	// if at least one of these is not null, we can display some stuff
+ 	            	if (categoryFilter == null) {
+ 	            		System.out.println("Executing search only query");
+ 	            		searchResults = stmt.executeQuery("SELECT * FROM product WHERE name LIKE '%" + searchFilter + "%'");
+ 	            	} else if (searchFilter != null){
+ 	            		System.out.println("Executing category AND search query");
+ 	            		System.out.println("categoryFilter: " + categoryFilter);
+ 	            		System.out.println("searchFilter: " + searchFilter);
+ 	            		searchResults = stmt.executeQuery("SELECT * FROM product WHERE category = " + categoryFilter + " AND name LIKE '%" + searchFilter + "%'");
+ 	            	}
+ 	            }
+ 	            
+ 	            if (searchResults != null) {
+ 	            %>
 
+ 	 	            <!-- Add an HTML table header row to format the results -->
+ 	 	            <table border="1">
+ 	 	            <tr>
+ 	 	                <th>Name</th>
+ 	 	                <th>Sku</th>
+ 	 	                <th>Price</th>
+ 	 	                <th>Category</th>
+ 	 	                
+ 	 	            </tr>
+
+ 	 	            <%-- -------- Iteration Code -------- --%>
+ 	 	            <%
+ 	 	                // Iterate over the ResultSet
+ 	 	                while (searchResults.next()) {
+ 	 	                	System.out.println("Executing while loop iteration...");
+ 	 	                	System.out.println("search ptr last?: " + searchResults.isLast());
+ 	 	                	int id = searchResults.getInt("id");
+ 	 	                	String name = searchResults.getString("name");
+ 	 	                	String sku = searchResults.getString("sku");
+ 	 	                	double price = searchResults.getDouble("price");
+ 	 	                	int categoryid = searchResults.getInt("category");
+ 	 	                	
+ 	 	                	// get the category name (very helpful)
+ 	 	                	String categoryName;
+ 	 	 	            	rsTemp = stmt.executeQuery("SELECT name FROM category WHERE id = " + categoryid);
+ 	 	 	            	rsTemp.next();
+ 	 	 	            	categoryName = rsTemp.getString("name");
+ 	 	 	            	System.out.println("Category name selected is: " + categoryName);
+ 	 	 	            	
+ 	 	 	            	// get all categories
+ 	 	 	            	rsTemp = stmt.executeQuery("SELECT * FROM category");
+
+ 					%>
+ 	 	            <tr>
+ 	 	                <form action="./Products.jsp" method="POST">
+ 	 	                    <input type="hidden" name="action" value="update"/>
+ 	 	                    <td><input name="name" value="<%=name%>"/></td>
+ 	 	                    <td><input name="sku" value="<%=sku%>"/></td>
+ 	 	                    <td><input name="price" value="<%=price%>"/></td>
+ 	 	                    <td><select name="category" selected="<%=categoryName%>">
+ 	 	                    <%
+ 	 	                    //String tempName;
+ 	 	                    /*while (rsTemp.next()) {
+ 	 	                    	System.out.println("In inner while loop");
+ 	 	                    	//rsTemp2 = stmt.executeQuery("SELECT name FROM category WHERE id = " + rsTemp.getInt("id"));
+ 	 	                    	//rsTemp2.next();
+ 	 	                    	tempName = rsTemp2.getString("name");*/
+
+ 	 	                    //}
+ 	 	                    %>
+ 	 	                    </select></td>
+ 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+ 	 	                    
+ 	 	                <%-- Button --%>
+ 	 	                <td><input type="submit" value="Update"></td>
+ 	 	                </form>
+
+ 	 	                <form action="./Products.jsp" method="POST">
+ 	 	                    <input type="hidden" name="action" value="delete"/>
+ 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+ 	 	                    <%-- Button --%>
+ 	 	                <td><input type="submit" value="Delete"/></td>
+ 	 	                </form>
+ 	 	            </tr>
+ 	 	            </table>
+ 	 	            <%
+ 	 	            System.out.println("right before end: search ptr last? + " + searchResults.isLast());
+ 	 	             }
+ 	  	         }
+ 	            	%>
+ 	           
  	            <%-- -------- Close Connection Code -------- --%>
  	            <%
  	                // Close the ResultSet
- 	                rs.close();
+ 	                /*rs.close();
  	            	rsTemp.close();
- 	            	rsTemp2.close();
+ 	            	rsTemp2.close();*/
 
  	                // Close the Statement
  	                statement.close();
@@ -356,8 +374,7 @@
  	                // it upwards
  	                %>Failed to insert new product.<%
  	               
- 	            }
- 	            finally {
+ 	            } finally {
  	                // Release resources in a finally block in reverse-order of
  	                // their creation
 
