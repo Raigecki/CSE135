@@ -75,17 +75,17 @@
 	
 			String action = request.getParameter("action");
 			
-			if (action.equals("add")) {
+			if (action != null && action.equals("add")) {
 			
 				Integer prodId = Integer.parseInt(request.getParameter("productId"));
 				Integer idUser = (Integer) session.getAttribute("userid");
 				Integer prodQuantity = Integer.parseInt(request.getParameter("productQuantity"));
 				
 				conn.setAutoCommit(false);
-				PreparedStatement insStmt = conn.prepareStatement("Insert into cart " +
+				PreparedStatement insStmt = conn.prepareStatement("INSERT INTO cart " +
 						"(userid, product, quantity) " + 
 						"values (?, ?, ?)");
-				insStmt.setString(1, idUser);
+				insStmt.setInt(1, idUser);
 				insStmt.setInt(2, prodId);
 				insStmt.setInt(3, prodQuantity);
 				

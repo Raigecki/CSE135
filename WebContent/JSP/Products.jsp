@@ -181,7 +181,7 @@
 			
  	                }
  	            %>
- 	            <%-- -------- DISPLAY PRODUCTS CODE -------- --%>
+ 	            <%-- -------- DISPLAY PRODUCTS BASED ON SEARCH PARAMETERS CODE -------- --%>
  	            <%
  	            	// check if we are to display products
  	            	if (action != null && action.equals("display")) {
@@ -269,7 +269,8 @@
  	            	}
  	            	%>
 
- 	            <%-- -------- SELECT Statement Code -------- --%>
+ 	            <%-- -------- DISPLAY INSERT FORM CODE -------- --%>
+ 	            
  	            <%
  	                // Create the statement
  	                Statement statement = conn.createStatement();
@@ -305,13 +306,44 @@
  	                    <th><input type="submit" value="Insert"/></th>
  	                </form>
  	            </tr>
-
+ 	            </table>
+ 	            
+ 	            <!-- SEARCH BAR STUFF -->
+ 	            <table>
+ 	            <tr>
+ 	            	<td>
+ 	            		<form action="./Products.jsp" method="POST">
+ 	            		<input type="hidden" name="action" value="display"/>
+ 	            		<input type="hidden" name="categoryid" value=""/>
+ 	            		<input value="" name="searchstring" size="15"/>
+ 	            		</form>
+ 	            	</td>
+ 	            	<td>
+ 	            		<input type="submit" value="Display"/>
+ 	            	<td>
+ 	            </tr>
+ 	            </table>
+ 	            	
+ 	            
+ 	            <!-- Now populate the category list in href form. The search bar comes after
+ 	            
+ 	            
+ 	            Statement stmt = conn.createStatement();
+ 	            rsTemp = stmt.executeQuery("SELECT * FROM category");
+ 	            while (rsTemp.next()) {
+ 	            	
+ 	            	
+ 	            }
+ 	            
+-->
  	            
 
  	            <%-- -------- Close Connection Code -------- --%>
  	            <%
  	                // Close the ResultSet
  	                rs.close();
+ 	            	rsTemp.close();
+ 	            	rsTemp2.close();
 
  	                // Close the Statement
  	                statement.close();
@@ -322,7 +354,7 @@
 
  	                // Wrap the SQL exception in a runtime exception to propagate
  	                // it upwards
- 	                %>Failure to insert new product.<%
+ 	                %>Failed to insert new product.<%
  	               
  	            }
  	            finally {
@@ -352,9 +384,6 @@
 			<% 
 			}
  			%>
- 	        	</table>
- 	        	</td>
- 	      	</tr>
 </table>
 </body>
 </html>
