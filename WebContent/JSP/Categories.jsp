@@ -9,7 +9,15 @@
 <body>
 
 			<a href="Home.jsp">Home</a>
-		<% Integer i=(Integer)(session.getAttribute("role"));
+		<% 
+		int userid = (Integer)session.getAttribute("userid");
+		String err = request.getParameter("error");
+		if (err != null) {
+			%><p>Data modification failure</p>
+		<%
+		}
+		
+		Integer i=(Integer)(session.getAttribute("role"));
  			if (i == null) {
  		%>
  		
@@ -35,6 +43,7 @@
  	            Connection conn = null;
  	            PreparedStatement pstmt = null;
  	            ResultSet rs = null;
+ 	            ResultSet rsTemp = null;
  	            
  	            try {
  	                // Registering Postgresql JDBC driver with the DriverManager
@@ -51,7 +60,14 @@
  	                String action = request.getParameter("action");
  	                // Check if an insertion is requested
  	                if (action != null && action.equals("insert")) {
-
+						// do error checking on provided parameters (no null parameters allowed)
+						String nameParam = request.getParameter("name");
+						String descParam = request.getParameter("description");
+						if (nameParam == "" || descParam == "") {
+							%>
+							<script>window.location.replace(window.location.href + "?error=1");</script>
+							<%
+						} else {
  	                    // Begin transaction
  	                    conn.setAutoCommit(false);
 
@@ -68,6 +84,7 @@
  	                    // Commit transaction
  	                    conn.commit();
  	                    conn.setAutoCommit(true);
+						}
  	                }
  	            %>
  	            
@@ -75,7 +92,14 @@
  	            <%
  	                // Check if an update is requested
  	                if (action != null && action.equals("update")) {
-
+ 	                	// do error checking on provided parameters (no null parameters allowed)
+						String nameParam = request.getParameter("name");
+						String descParam = request.getParameter("description");
+						if (nameParam == "" || descParam == "") {
+							%>
+							<script>window.location.replace(window.location.href + "?error=1");</script>
+							<%
+						} else {
  	                    // Begin transaction
  	                    conn.setAutoCommit(false);
 
@@ -94,6 +118,7 @@
  	                    // Commit transaction
  	                    conn.commit();
  	                    conn.setAutoCommit(true);
+						}
  	                }
  	            %>
  	            
@@ -101,22 +126,42 @@
  	            <%
  	                // Check if a delete is requested
  	                if (action != null && action.equals("delete")) {
-
+ 	                	// do error checking on provided parameters (no null parameters allowed)
+						String nameParam = request.getParameter("name");
+						String descParam = request.getParameter("description");
+						if (nameParam == "" || descParam == "") {
+							%>
+							<script>window.location.replace(window.location.href + "?error=1");</script>
+							<%
+						} else {
  	                    // Begin transaction
  	                    conn.setAutoCommit(false);
 
  	                    // Create the prepared statement and use it to
  	                    // DELETE students FROM the Students table.
+ 	                    
  	                    pstmt = conn
  	                        .prepareStatement("DELETE FROM category WHERE id = ?");
 
  	                    System.out.println("request.getParameter(id): " + request.getParameter("id"));
  	                    pstmt.setInt(1, Integer.parseInt(request.getParameter("id")));
- 	                    int rowCount = pstmt.executeUpdate();
+ 	                    
+ 	                	// check if category has at least one product associated with it (concurrency check)
+ 	   					Statement tempstmt = conn.createStatement();
+ 	   					rsTemp = tempstmt.executeQuery("SELECT id FROM incategory WHERE category = " + Integer.parseInt(request.getParameter("id")));
+ 	   					if (!rsTemp.next()) {
+ 	   						// if there is no products in the category still, go ahead and update
+ 	   					
+ 	                    	int rowCount = pstmt.executeUpdate();
 
- 	                    // Commit transaction
- 	                    conn.commit();
- 	                    conn.setAutoCommit(true);
+ 	                    	// Commit transaction
+ 	                   		conn.commit();
+ 	                    	conn.setAutoCommit(true);
+						} else {
+							%> <script>window.location.replace(window.location.href + "?error=1");</script>
+							<%
+						}
+ 	                }
  	                }
  	            %>
 
@@ -150,33 +195,57 @@
  	            <%
  	                // Iterate over the ResultSet
  	                while (rs.next()) {
- 	            %>
+ 	                	int id = rs.getInt("id");
+ 	                	int categoryOwner = rs.getInt("userid");
+ 	                	String name = rs.getString("name");
+ 	                	String descr = rs.getString("description");
+ 	                	
+ 	                	if (categoryOwner != userid) {
+ 	                		// then this user cannot update or delete this category
+ 	                		%>
+ 	                		<tr>
+ 	                			<td><p><%=name%></p></td>
+ 	                			<td><p><%=descr%></p></td>
+ 	                		</tr>
+ 	                	<%
+ 	                	} else {
+ 	            		%>
 
+				
  	            <tr>
  	                <form action="./Categories.jsp" method="POST">
  	                    <input type="hidden" name="action" value="update"/>
- 	                    <td><input name="name" value="<%=rs.getString("name")%>"/></td>
- 	                    <input type="hidden" name="id" value="<%=rs.getInt("id")%>">
+ 	                    <td><input name="name" value="<%=name%>"/></td>
+ 	                    <input type="hidden" name="id" value="<%=id%>">
+ 	                    
 
  	                <%-- Get the description --%>
  	                <td>
- 	                    <input value="<%=rs.getString("description")%>" name="description" size="25"/>
+ 	                    <input value="<%=descr%>" name="description" size="25"/>
  	                </td>
-
  	                <%-- Button --%>
  	                <td><input type="submit" value="Update"></td>
  	                </form>
+
+				<%
+				// check if category has at least one product associated with it
+				statement = conn.createStatement();
+				rsTemp = statement.executeQuery("SELECT id FROM incategory WHERE category = " + id);
+				if (!rsTemp.next()) {
+					// if there are NO products associated with this category, display the delete button
+				%>
+
  	                <form action="./Categories.jsp" method="POST">
  	                    <input type="hidden" name="action" value="delete"/>
- 	                    <input type="hidden" name="id" value="<%=rs.getInt("id")%>"/>
+ 	                    <input type="hidden" name="id" value="<%=id%>"/>
  	                    <%-- Button --%>
  	                <td><input type="submit" value="Delete"/></td>
  	                </form>
  	            </tr>
-
  	            <%
- 	            System.out.println("rs.getInt(id): " + rs.getInt("id"));
+ 	            		}
  	                }
+ 	            }
  	            %>
 
  	            <%-- -------- Close Connection Code -------- --%>
