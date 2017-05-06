@@ -218,7 +218,7 @@
  	                    }
  	                    %>
  	                    </select>
- 	                    <th><input type="submit" value="Insert"/></th>
+ 	                    </th><th><input type="submit" value="Insert"/></th>
  	                </form>
  	            </tr>
  	            </table>
@@ -257,7 +257,7 @@
  	            <%
  	            if (action != null && action.equals("setCategoryToDisplay")) {
  	            	session.setAttribute("categoryToDisplay", request.getParameter("category"));
- 	            	session.setAttribute("searchstring", null);
+ 	            	session.setAttribute("searchStringToDisplay", null);
  	            	System.out.println("Category just got set to: " + (String) session.getAttribute("categoryToDisplay"));
  	            }
  	            if (action != null && action.equals("setSearchStringToDisplay")) {
@@ -270,7 +270,12 @@
  	            String categoryFilter = (String) session.getAttribute("categoryToDisplay");
  	            String searchFilter = (String) session.getAttribute("searchStringToDisplay");
  	            if (categoryFilter != null || searchFilter != null) {
+ 	            	System.out.println("Entered possible query if statement");
  	            	// if at least one of these is not null, we can display some stuff
+ 	            	if (searchFilter == null) {
+ 	            		searchFilter = "";
+ 	            	}
+ 	       
  	            	if (categoryFilter == null) {
  	            		System.out.println("Executing search only query");
  	            		searchResults = stmt.executeQuery("SELECT * FROM product WHERE name LIKE '%" + searchFilter + "%'");
@@ -326,14 +331,16 @@
  	 	                    <td><input name="price" value="<%=price%>"/></td>
  	 	                    <td><select name="category" selected="<%=categoryName%>">
  	 	                    <%
- 	 	                    //String tempName;
- 	 	                    /*while (rsTemp.next()) {
+ 	 	                    String tempName;
+ 	 	                    while (rsTemp.next()) {
  	 	                    	System.out.println("In inner while loop");
- 	 	                    	//rsTemp2 = stmt.executeQuery("SELECT name FROM category WHERE id = " + rsTemp.getInt("id"));
- 	 	                    	//rsTemp2.next();
- 	 	                    	tempName = rsTemp2.getString("name");*/
-
- 	 	                    //}
+ 	 	                    	rsTemp2 = stmt.executeQuery("SELECT name FROM category WHERE id = " + rsTemp.getInt("id"));
+ 	 	                    	rsTemp2.next();
+ 	 	                    	tempName = rsTemp2.getString("name");
+ 	 	                    %>
+ 	 	                    	<option value=<%=rsTemp.getInt("id")%>><%=rsTemp.getString("name")%></option>
+ 	 	                    <%
+ 	 	                    }
  	 	                    %>
  	 	                    </select></td>
  	 	                    <input type="hidden" name="id" value="<%=id%>"/>
