@@ -9,7 +9,7 @@
 <body>
 
 	<a href="Home.jsp">Home</a> </br>
-	<a href="Buy.jsp">Buy Shopping Cart</a>
+	<a href="Buy.jsp">Buy Shopping Cart</a> </br>
 	
 	<%@ page import="java.sql.*" %>
 	
@@ -35,32 +35,34 @@
 		
 	%>
 		
-	<h3>Categories:</h3>
+		
+	<!-- /////////////////Search Bar Code/////////////////// -->
 	
-	<form method="get">
-		<select name="select_category">
-		
-		<!-- Iteration Code -->
-		<%	
-		
-			while(catList.next()) { 
-				
-				String category = (String) catList.getString("name");
-				Integer id = (Integer) catList.getInt("id");
-				System.out.println(category);
-		%>			
-		
-			<option value="<%= id%>"><%=category%></option>					
-			
-		<% } 
-			popStmt.close();
-			catList.close();
-		%>
-				
-		</select>
-		<input type="hidden" name="action" value="search"/>
-		<input type="submit" value="Search"/>
-	</form>
+	 	</br></br>
+ 	     <form method="get">
+ 	     	<input type="hidden" name="action" 
+ 	       		value="setSearchStringToDisplay"/>
+ 	     	<input value="" name="searchstring" size="15"/>
+ 	      	<input type="submit" value="Search"/>
+ 	     </form>
+ 		
+ 	<!-- /////////////////Category List Code//////////////// -->
+ 	
+ 	</br>
+ 	<h4>Categories:</h3>
+ 	
+ 	<%
+ 		PreparedStatement catStmt = conn.prepareStatement("SELECT * from category");
+ 	    ResultSet catRes = catStmt.executeQuery();
+ 	    String hrefstring;
+ 	    while (catRes.next()) {
+ 	    	hrefstring = "./Browse.jsp?action=setCategoryToDisplay" + "&category=" + catRes.getInt("id");
+ 	%>
+ 	    <a href=<%=hrefstring %>><%=catRes.getString("name")%></a></br>	
+ 	<%
+ 	    }
+ 	%>
+ 	
 	
 	</br>
 	<table name=table_Products border="1">

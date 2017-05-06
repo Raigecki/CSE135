@@ -51,34 +51,35 @@
 			
 		<!-- ////////////////////////////////////////Statement Code//////////////////////////////////////// -->
 		<% 
-			PreparedStatement verifyStmt = conn.prepareStatement("SELECT id, name, role FROM usert WHERE name =?");
-			
-			verifyStmt.setString(1, user);
-			
-			ResultSet result = verifyStmt.executeQuery();			
-			
-			if (result.next()) {
+				PreparedStatement verifyStmt = conn.prepareStatement("SELECT id, name, role FROM usert WHERE name =?");
 				
-				int role = result.getInt("role");
-				int userid = result.getInt("id");
-				String name = result.getString("name");
-				System.out.println("role: " + role);
-				System.out.println("name: " + name);
-				System.out.println("userid: " + userid);
+				verifyStmt.setString(1, user);
 				
-				session.setAttribute("role", role);
-				session.setAttribute("user", name);
-				session.setAttribute("userid", userid);
-				response.sendRedirect("Home.jsp");
-			}
-			else{ 
+				ResultSet result = verifyStmt.executeQuery();			
+				
+				if (result.next()) {
+					
+					int role = result.getInt("role");
+					int userid = result.getInt("id");
+					String name = result.getString("name");
+					/*
+					System.out.println("role: " + role);
+					System.out.println("name: " + name);
+					System.out.println("userid: " + userid);
+					*/
+					session.setAttribute("role", role);
+					session.setAttribute("user", name);
+					session.setAttribute("userid", userid);
+					response.sendRedirect("Home.jsp");
+				}
+				else{ 
 		%>
 			
 			<h4 id="text_errorMsg">User name not found</h4>
 						
 		<% 
-				response.sendRedirect("index.jsp");
-			}
+					response.sendRedirect("index.jsp");
+				}
 		%>
 		
 	<!-- ///////////////////////////////////Close connection code/////////////////////////////////////// -->
