@@ -335,17 +335,19 @@
 	 	 	 	                    <%
 	 	 	 	                    
 	 	 	 	                    String tempName;
-	 	 	 	                    while (tempRes.next()) {
+	 	 	 	                    int innerIndex = 0;
+	 	 	 	                 	PreparedStatement tempStmt2;
+	 	 	 	                    while (catRes.next()) {
+	 	 	 	                    	innerIndex++;
+	 	 	 	                    	
 	 	 	 	                    	System.out.println("In inner while loop");
-	 	 	 	                    	PreparedStatement tempStmt2 = conn.prepareStatement("SELECT " + 
-	 	 	 	                    	"name FROM category WHERE id = " + tempRes.getInt("id"));
-	 	 	 	                    	ResultSet tempRes2 = tempStmt2.executeQuery();
-	 	 	 	                    	tempRes2.next();
-	 	 	 	                    	tempName = tempRes2.getString("name");
+	 	 	 	                    	
+	 	 	 	                    	tempName = catRes.getString("name");
 	 	 	 	                    %>
-	 	 	 	                    	<option value=<%=tempRes.getInt("id")%>><%=tempRes.getString("name")%></option>
+	 	 	 	                    	<option value=<%=catRes.getInt("id")%>><%=tempName%></option>
 	 	 	 	                    <%
 	 	 	 	                    }
+	 	 	 	                    System.out.println("InnerIndex:" + innerIndex);
 	 	 	 	                    %>
 	 	 	 	                    </select></td>
 	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
