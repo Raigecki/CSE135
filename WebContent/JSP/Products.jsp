@@ -296,7 +296,7 @@
  	            	}
  	       
  	            	PreparedStatement searchQuery = null;
- 	  				// decide what to query
+ 	  				// decide what to query!
  	            	if (categoryFilter == null || categoryFilter.equals("-1")) {
  	            		System.out.println("Executing search only query");
  	 	            	searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE product.name LIKE '%" + searchFilter + "%'");
