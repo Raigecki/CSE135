@@ -34,8 +34,15 @@
 			Integer productPrice = (Integer) session.getAttribute("productPrice");
 			Integer productId = (Integer) session.getAttribute("productId");
 			
+			System.out.println(productName);
+			System.out.println(productSKU);
+			System.out.println(productPrice);
+			System.out.println(productId);
+			
+			
 			//Get information for the current shopping cart
 			Integer userId = (Integer) session.getAttribute("userid");
+			System.out.println(userId);
 			
 			PreparedStatement getStmt = conn.prepareStatement("SELECT " +
 					"product.name, product.price, product.sku, " +
@@ -93,9 +100,10 @@
 				
 				conn.commit();
 				conn.setAutoCommit(true);
+				
+				response.sendRedirect("Browse.jsp");
 			}
 		
-	
 	%>
 
 	<h3>Your Orders:</h3>
@@ -116,6 +124,13 @@
 			Integer itemPrice = cartItem.getInt("price");
 			Integer itemQuantity = cartItem.getInt("quantity");
 			Integer itemId = cartItem.getInt("product");
+			
+			System.out.println(itemName);
+			System.out.println(itemSKU);
+			System.out.println(itemPrice);
+			System.out.println(itemQuantity);
+			System.out.println(itemId);
+			
 		%>
 		<tr>
 			<td><input name="itemName" value="<%= itemName %>" /></td>

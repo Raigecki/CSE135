@@ -76,7 +76,7 @@
 	<%
 	
 		String action = request.getParameter("action");
-		if (action.equals("search")) {
+		if (action != null && action.equals("search")) {
 			
 			Integer categoryid = Integer.parseInt(request.getParameter("select_category"));
 		
@@ -121,7 +121,7 @@
 	<!-- /////////////////////////////////////Insertion Code////////////////////////////////////////// -->
 	<%
 		
-		if (action.equals("buy")) {
+		if (action != null && action.equals("buy")) {
 				
 			System.out.println("Got into buy");
 				

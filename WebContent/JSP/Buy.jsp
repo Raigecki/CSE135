@@ -29,25 +29,54 @@
 	<!-- //////////////////////Initialization Code //////////////////// -->
 	
 	<%		
+		
 			//Get information for the current shopping cart
 			Integer userId = (Integer) session.getAttribute("userid");
 			
 			PreparedStatement getStmt = conn.prepareStatement("SELECT " +
 					"product.name, product.price, product.sku, " +
-					"cart.quantity, cart.product " +
+					"cart.quantity, cart.product, cart.id " +
 					"from cart " + 
 					"join product on product.id = cart.product " +
 					"where cart.userid =?");
 			getStmt.setInt(1, userId);
 			ResultSet cartItem = getStmt.executeQuery();
+			
+	%>
+	
+	<!-- //////////////////////Confirmation Code ////////////////////// -->
+	<% 
+			String action = request.getParameter("action");
+			
+			if (action != null && action.equals("Purchase")) {
+				
+				System.out.println("Got into buy");
+				
+				PreparedStatement reStmt = conn.prepareStatement("SELECT " +
+						"id from cart WHERE userid =?");
+				reStmt.setInt(1, userId);
+				ResultSet idCart = reStmt.executeQuery();
+				
+				if (idCart.next()) {
+					Integer cartId = idCart.getInt("id");
+					
+					System.out.println(cartId);
+					session.setAttribute("cartId", cartId);
+					response.sendRedirect("Confirmation.jsp");
+				}			
+			}
+			
+			
 	%>
 	
 	</br>
+	
+	<h4>Beware of identity theft and credit card fraud</h4>
+	
 	<form method="post">
-		<input type="text" name="input_creditCard" /> 
+		Credit Card Number: <input type="text" name="input_creditCard" /> 
 		<input type="submit" name="action" value="Purchase" />
 	</form>
-	<h4>Beware of identity theft and credit card fraud</h4>
 	
 	<h3>Your Orders:</h3>
 	

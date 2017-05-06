@@ -302,66 +302,73 @@
 
  	 	            <%-- -------- Iteration Code -------- --%>
  	 	            <%
- 	 	                // Iterate over the ResultSet
- 	 	                while (searchResults.next()) {
- 	 	                	System.out.println("Executing while loop iteration...");
- 	 	                	System.out.println("search ptr last?: " + searchResults.isLast());
- 	 	                	int id = searchResults.getInt("id");
- 	 	                	String name = searchResults.getString("name");
- 	 	                	String sku = searchResults.getString("sku");
- 	 	                	double price = searchResults.getDouble("price");
- 	 	                	int categoryid = searchResults.getInt("category");
- 	 	                	
- 	 	                	// get the category name (very helpful)
+ 	 	            int index = 0;
+ 	 	            	while (searchResults.next()) {
+ 	 	           			index++;
+ 	 	           			int id = searchResults.getInt("id");
+	 	                	String name = searchResults.getString("name");
+	 	                	String sku = searchResults.getString("sku");
+	 	                	double price = searchResults.getDouble("price");
+	 	                	int categoryid = searchResults.getInt("category"); 	           	
+	 	                	
+	 	                	// get the category name (very helpful)
  	 	                	String categoryName;
- 	 	 	            	rsTemp = stmt.executeQuery("SELECT name FROM category WHERE id = " + categoryid);
- 	 	 	            	rsTemp.next();
- 	 	 	            	categoryName = rsTemp.getString("name");
- 	 	 	            	System.out.println("Category name selected is: " + categoryName);
- 	 	 	            	
- 	 	 	            	// get all categories
- 	 	 	            	rsTemp = stmt.executeQuery("SELECT * FROM category");
+	 	                	
+	 	                	PreparedStatement preStmt = conn.prepareStatement("SELECT name FROM category WHERE id = " + categoryid);
+ 	 	 	            	ResultSet tempRes = preStmt.executeQuery();
+	 	                	tempRes.next();
+	 	                	
+	 	                	categoryName = tempRes.getString("name");
+	 	                	
+	 	                	// get all categories
+	 	                	PreparedStatement catStmt = conn.prepareStatement("SELECT * FROM category");
+	 	                	ResultSet catRes = catStmt.executeQuery();
+	 	                	
+	 	                	%>
+	 	 	 	            <tr>
+	 	 	 	                <form action="./Products.jsp" method="POST">
+	 	 	 	                    <input type="hidden" name="action" value="update"/>
+	 	 	 	                    <td><input name="name" value="<%=name%>"/></td>
+	 	 	 	                    <td><input name="sku" value="<%=sku%>"/></td>
+	 	 	 	                    <td><input name="price" value="<%=price%>"/></td>
+	 	 	 	                    <td><select name="category" selected="<%=categoryName%>">
+	 	 	 	                    <%
+	 	 	 	                    
+	 	 	 	                    String tempName;
+	 	 	 	                    while (tempRes.next()) {
+	 	 	 	                    	System.out.println("In inner while loop");
+	 	 	 	                    	PreparedStatement tempStmt2 = conn.prepareStatement("SELECT " + 
+	 	 	 	                    	"name FROM category WHERE id = " + tempRes.getInt("id"));
+	 	 	 	                    	ResultSet tempRes2 = tempStmt2.executeQuery();
+	 	 	 	                    	tempRes2.next();
+	 	 	 	                    	tempName = tempRes2.getString("name");
+	 	 	 	                    %>
+	 	 	 	                    	<option value=<%=tempRes.getInt("id")%>><%=tempRes.getString("name")%></option>
+	 	 	 	                    <%
+	 	 	 	                    }
+	 	 	 	                    %>
+	 	 	 	                    </select></td>
+	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+	 	 	 	                    
+	 	 	 	                <%-- Button --%>
+	 	 	 	                <td><input type="submit" value="Update"></td>
+	 	 	 	                </form>
 
- 					%>
- 	 	            <tr>
- 	 	                <form action="./Products.jsp" method="POST">
- 	 	                    <input type="hidden" name="action" value="update"/>
- 	 	                    <td><input name="name" value="<%=name%>"/></td>
- 	 	                    <td><input name="sku" value="<%=sku%>"/></td>
- 	 	                    <td><input name="price" value="<%=price%>"/></td>
- 	 	                    <td><select name="category" selected="<%=categoryName%>">
- 	 	                    <%
- 	 	                    String tempName;
- 	 	                    while (rsTemp.next()) {
- 	 	                    	System.out.println("In inner while loop");
- 	 	                    	rsTemp2 = stmt.executeQuery("SELECT name FROM category WHERE id = " + rsTemp.getInt("id"));
- 	 	                    	rsTemp2.next();
- 	 	                    	tempName = rsTemp2.getString("name");
- 	 	                    %>
- 	 	                    	<option value=<%=rsTemp.getInt("id")%>><%=rsTemp.getString("name")%></option>
- 	 	                    <%
- 	 	                    }
- 	 	                    %>
- 	 	                    </select></td>
- 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
- 	 	                    
- 	 	                <%-- Button --%>
- 	 	                <td><input type="submit" value="Update"></td>
- 	 	                </form>
-
- 	 	                <form action="./Products.jsp" method="POST">
- 	 	                    <input type="hidden" name="action" value="delete"/>
- 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
- 	 	                    <%-- Button --%>
- 	 	                <td><input type="submit" value="Delete"/></td>
- 	 	                </form>
- 	 	            </tr>
- 	 	            </table>
- 	 	            <%
- 	 	            System.out.println("right before end: search ptr last? + " + searchResults.isLast());
- 	 	             }
- 	  	         }
- 	            	%>
+	 	 	 	                <form action="./Products.jsp" method="POST">
+	 	 	 	                    <input type="hidden" name="action" value="delete"/>
+	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+	 	 	 	                    <%-- Button --%>
+	 	 	 	                <td><input type="submit" value="Delete"/></td>
+	 	 	 	                </form>
+	 	 	 	            </tr>
+	 	 	 	           
+	 	 	 	        <% } %>
+ 	 	         
+ 	 	            	</table>
+ 	 	            <% 
+ 	 	            	System.out.println("index: " + index);	
+ 	            	} %>
+ 	            	
  	           
  	            <%-- -------- Close Connection Code -------- --%>
  	            <%
