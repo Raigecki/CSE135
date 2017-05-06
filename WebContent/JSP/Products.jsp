@@ -276,14 +276,17 @@
  	            		searchFilter = "";
  	            	}
  	       
+ 	            	PreparedStatement searchQuery = null;
  	            	if (categoryFilter == null) {
  	            		System.out.println("Executing search only query");
- 	            		searchResults = stmt.executeQuery("SELECT * FROM product WHERE name LIKE '%" + searchFilter + "%'");
+ 	 	            	searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE product.name LIKE '%" + searchFilter + "%'");
+ 	            		searchResults = searchQuery.executeQuery();
  	            	} else if (searchFilter != null){
  	            		System.out.println("Executing category AND search query");
  	            		System.out.println("categoryFilter: " + categoryFilter);
  	            		System.out.println("searchFilter: " + searchFilter);
- 	            		searchResults = stmt.executeQuery("SELECT * FROM product WHERE category = " + categoryFilter + " AND name LIKE '%" + searchFilter + "%'");
+ 	            		searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE category = " + categoryFilter + " AND product.name LIKE '%" + searchFilter + "%'");
+ 	            		searchResults = searchQuery.executeQuery();
  	            	}
  	            }
  	            
@@ -302,7 +305,11 @@
 
  	 	            <%-- -------- Iteration Code -------- --%>
  	 	            <%
+ 	 	       		// get all categories
+	               	PreparedStatement catStmt = conn.prepareStatement("SELECT * FROM category", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+	               	ResultSet catRes = catStmt.executeQuery();
  	 	            int index = 0;
+ 	 	            String categoryName = "";
  	 	            	while (searchResults.next()) {
  	 	           			index++;
  	 	           			int id = searchResults.getInt("id");
@@ -312,18 +319,8 @@
 	 	                	int categoryid = searchResults.getInt("category"); 	           	
 	 	                	
 	 	                	// get the category name (very helpful)
- 	 	                	String categoryName;
-	 	                	
-	 	                	PreparedStatement preStmt = conn.prepareStatement("SELECT name FROM category WHERE id = " + categoryid);
- 	 	 	            	ResultSet tempRes = preStmt.executeQuery();
-	 	                	tempRes.next();
-	 	                	
-	 	                	categoryName = tempRes.getString("name");
-	 	                	
-	 	                	// get all categories
-	 	                	PreparedStatement catStmt = conn.prepareStatement("SELECT * FROM category");
-	 	                	ResultSet catRes = catStmt.executeQuery();
-	 	                	
+	 	                	categoryName = searchResults.getString("cname");
+	 	                	System.out.println("categoryName: " + categoryName);
 	 	                	%>
 	 	 	 	            <tr>
 	 	 	 	                <form action="./Products.jsp" method="POST">
@@ -331,7 +328,7 @@
 	 	 	 	                    <td><input name="name" value="<%=name%>"/></td>
 	 	 	 	                    <td><input name="sku" value="<%=sku%>"/></td>
 	 	 	 	                    <td><input name="price" value="<%=price%>"/></td>
-	 	 	 	                    <td><select name="category" selected="<%=categoryName%>">
+	 	 	 	                    <td><select name="category">
 	 	 	 	                    <%
 	 	 	 	                    
 	 	 	 	                    String tempName;
@@ -339,15 +336,18 @@
 	 	 	 	                 	PreparedStatement tempStmt2;
 	 	 	 	                    while (catRes.next()) {
 	 	 	 	                    	innerIndex++;
-	 	 	 	                    	
-	 	 	 	                    	System.out.println("In inner while loop");
-	 	 	 	                    	
+	 	 	 	                    		 	 	 	                    	
 	 	 	 	                    	tempName = catRes.getString("name");
+	 	 	 	                    	if (tempName.equals(categoryName)) {
+	 	 	 	                    		%>
+	 	 	 	                    		<option value=<%=catRes.getInt("id")%> selected><%=tempName%></option>
+	 	 	 	                    	<%
+	 	 	 	                    	} else {
 	 	 	 	                    %>
 	 	 	 	                    	<option value=<%=catRes.getInt("id")%>><%=tempName%></option>
 	 	 	 	                    <%
+	 	 	 	                    	}
 	 	 	 	                    }
-	 	 	 	                    System.out.println("InnerIndex:" + innerIndex);
 	 	 	 	                    %>
 	 	 	 	                    </select></td>
 	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
@@ -364,7 +364,9 @@
 	 	 	 	                </form>
 	 	 	 	            </tr>
 	 	 	 	           
-	 	 	 	        <% } %>
+	 	 	 	        <% 
+	 	 	 	        catRes.beforeFirst();
+ 	 	            	} %>
  	 	         
  	 	            	</table>
  	 	            <% 
@@ -389,6 +391,7 @@
  	                // Wrap the SQL exception in a runtime exception to propagate
  	                // it upwards
  	                %>Failed to insert new product.<%
+ 	                throw new RuntimeException(e);
  	               
  	            } finally {
  	                // Release resources in a finally block in reverse-order of
