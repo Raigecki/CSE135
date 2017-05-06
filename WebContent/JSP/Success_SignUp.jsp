@@ -7,6 +7,7 @@
 <title>Sign Up Success</title>
 </head>
 <body>
+	<a href="index.jsp">Home</a>
 
 	<h2>Sign up successful</h2>
 

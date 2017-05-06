@@ -141,7 +141,7 @@
 			Integer productId = Integer.parseInt(request.getParameter("productid"));
 			String productName = request.getParameter("name");
 			String productSKU = request.getParameter("sku");
-			Integer productPrice = Integer.parseInt(request.getParameter("price"));
+			Double productPrice = Double.parseDouble(request.getParameter("price"));
 				
 			session.setAttribute("productId", productId);
 			session.setAttribute("productName", productName);
@@ -172,7 +172,7 @@
 	                System.out.println("categoryName: " + categoryName);
 	            %>
 	 	 	    <tr>
-	 	 	    	<form method="post">
+	 	 	    	<form method="post" action="./Browse.jsp">
 	 	 	        	
 	 	 	            <td><input name="name" value="<%=name%>"/></td>
 	 	 	            <td><input name="sku" value="<%=sku%>"/></td>

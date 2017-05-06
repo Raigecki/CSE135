@@ -112,12 +112,11 @@ public class Servlet_SignUp extends HttpServlet {
 				postStmt.setInt(2,age);
 				postStmt.setInt(3, state);
 				postStmt.setInt(4, role);
-				postStmt.executeQuery();
+				postStmt.executeUpdate();
 				response.sendRedirect("Success_SignUp.jsp");
 			}
 			
 			verifyStmt.close();
-			postStmt.close();
 			conn.close();
 
 		} catch (Exception e) {

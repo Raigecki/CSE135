@@ -31,7 +31,7 @@
 			//Get all the information for the item that is just clicked
 			String productName = (String) session.getAttribute("productName");
 			String productSKU = (String) session.getAttribute("productSKU");
-			Integer productPrice = (Integer) session.getAttribute("productPrice");
+			Double productPrice = (Double) session.getAttribute("productPrice");
 			Integer productId = (Integer) session.getAttribute("productId");
 			
 			/*
@@ -57,6 +57,14 @@
 
 	<h4>Select Quantity:</h4>
 	
+	<%
+	if (productName == null || productSKU == null || productPrice == null || productId == null) {
+	%>Your shopping cart is empty!
+	<%
+	} else {
+	%>
+	
+	
 	<table border="1">
 		<tr>
 			<th>Product</th>
@@ -77,6 +85,9 @@
 		</tr>
 		
 	</table>
+	<%
+	}
+	%>
 	
 	<!-- ////////////////////////////Update Code /////////////////////////////// -->
 	<%
@@ -126,7 +137,7 @@
 		
 			String itemName = cartItem.getString("name");
 			String itemSKU = cartItem.getString("sku");
-			Integer itemPrice = cartItem.getInt("price");
+			Double itemPrice = cartItem.getDouble("price");
 			Integer itemQuantity = cartItem.getInt("quantity");
 			Integer itemId = cartItem.getInt("product");
 			

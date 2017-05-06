@@ -58,15 +58,12 @@
 				ResultSet idCart = reStmt.executeQuery();
 				
 				if (idCart.next()) {
-					Integer cartId = idCart.getInt("id");
-					
-					System.out.println(cartId);
-					session.setAttribute("cartId", cartId);
 					response.sendRedirect("Confirmation.jsp");
-				}			
+				}	
+				reStmt.close();
+				idCart.close();
 			}
-			reStmt.close();
-			idCart.close();
+
 	%>
 	
 	</br>

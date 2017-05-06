@@ -31,13 +31,19 @@
 	<!-- /////////////////////// Delete Code ////////////////////////// -->
 	
 	<% 		
-			Integer cartId = (Integer) session.getAttribute("cartId");
-			
+			Integer userid = (Integer) session.getAttribute("userid");
 			conn.setAutoCommit(false);
-			PreparedStatement delStmt = conn.prepareStatement("DELETE FROM " +
-					" cart WHERE id =?");
-			delStmt.setInt(1, cartId);
+			PreparedStatement delStmt = conn.prepareStatement("DELETE FROM" +
+					" cart WHERE userid =?");
+			delStmt.setInt(1, userid);
 			int res = delStmt.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+			
+			session.setAttribute("productName", null);
+			session.setAttribute("productSKU", null);
+			session.setAttribute("productPrice", null);
+			session.setAttribute("productId", null);
 	
 	
 	%>

@@ -136,35 +136,46 @@
 							<script>window.location.replace(window.location.href + "?error=1");</script>
 							<%
 						} else {
- 	                    // Begin transaction
- 	                    conn.setAutoCommit(false);
+ 	                    	// Begin transaction
+ 	                    	conn.setAutoCommit(false);
 
- 	                    // Create the prepared statement and use it to
- 	                    // DELETE students FROM the Students table.
+ 	                    	// Create the prepared statement and use it to
+ 	                    	// DELETE students FROM the Students table.
  	                    
- 	                    pstmt = conn
- 	                        .prepareStatement("DELETE FROM category WHERE id = ?");
+ 	                    	// see if somehow a product got added to category
+ 	                    	pstmt = conn.prepareStatement("SELECT * FROM incategory WHERE category = ?");
+ 	                    	pstmt.setInt(1, Integer.parseInt(request.getParameter("id")));
+ 	                    	rsTemp = pstmt.executeQuery();
+ 	                    	conn.commit();
+ 	                    	if (rsTemp.next()) {
+ 	                    		// then there is a product and we can no longer delete.
+ 	                    		%>Error: Cannot delete category: category now has at least one product associated with it.<%
+ 	                    	} else {
+ 	                    
+ 	                    		pstmt = conn
+ 	                        		.prepareStatement("DELETE FROM category WHERE id = ?");
 
- 	                    System.out.println("request.getParameter(id): " + request.getParameter("id"));
- 	                    pstmt.setInt(1, Integer.parseInt(request.getParameter("id")));
+ 	                    		System.out.println("request.getParameter(id): " + request.getParameter("id"));
+ 	                    		pstmt.setInt(1, Integer.parseInt(request.getParameter("id")));
  	                    
- 	                	// check if category has at least one product associated with it (concurrency check)
- 	   					Statement tempstmt = conn.createStatement();
- 	   					rsTemp = tempstmt.executeQuery("SELECT id FROM incategory WHERE category = " + Integer.parseInt(request.getParameter("id")));
- 	   					if (!rsTemp.next()) {
- 	   						// if there is no products in the category still, go ahead and update
+ 	                			// check if category has at least one product associated with it (concurrency check)
+ 	   							Statement tempstmt = conn.createStatement();
+ 	   							rsTemp = tempstmt.executeQuery("SELECT id FROM incategory WHERE category = " + Integer.parseInt(request.getParameter("id")));
+ 	   							if (!rsTemp.next()) {
+ 	   								// if there is no products in the category still, go ahead and update
  	   					
- 	                    	int rowCount = pstmt.executeUpdate();
+ 	                    			int rowCount = pstmt.executeUpdate();
 
- 	                    	// Commit transaction
- 	                   		conn.commit();
- 	                    	conn.setAutoCommit(true);
-						} else {
-							%> <script>window.location.replace(window.location.href + "?error=1");</script>
-							<%
-						}
- 	                }
+ 	                    			// Commit transaction
+ 	                   				conn.commit();
+ 	                    			conn.setAutoCommit(true);
+								} else {
+									%> <script>window.location.replace(window.location.href + "?error=1");</script>
+									<%
+								}
+ 	               			}
 						%>Successfully deleted category.<%
+ 	                	}
  	                }
  	            %>
 
