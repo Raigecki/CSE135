@@ -260,6 +260,8 @@
  	            <%
  	            Statement stmt = conn.createStatement();
  	            rsTemp2 = stmt.executeQuery("SELECT * from category");
+ 	            
+ 	            //tells display to display all products
  	            String hrefstring = "./Products.jsp?action=setCategoryToDisplay&category=-1";
  	            %>
  	            </br><a href=<%=hrefstring %>>All Products</a>
@@ -297,11 +299,15 @@
  	       
  	            	PreparedStatement searchQuery = null;
  	  				// decide what to query!
+ 	  				
+ 	  				//case when we need to display products without category
  	            	if (categoryFilter == null || categoryFilter.equals("-1")) {
  	            		System.out.println("Executing search only query");
  	 	            	searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE product.name LIKE '%" + searchFilter + "%'");
  	            		searchResults = searchQuery.executeQuery();
- 	            	} else if (searchFilter != null){
+ 	            	} 
+ 	            	//case when we need to search based on category and search string
+ 	            	else if (searchFilter != null){
  	            		System.out.println("Executing category AND search query");
  	            		System.out.println("categoryFilter: " + categoryFilter);
  	            		System.out.println("searchFilter: " + searchFilter);

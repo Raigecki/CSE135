@@ -49,12 +49,17 @@
  	<!-- /////////////////Category List Code//////////////// -->
  	
  	</br>
- 	<h4>Categories:</h3>
+ 	<h4>Categories:</h4>
  	
  	<%
  		PreparedStatement catStmt = conn.prepareStatement("SELECT * from category");
  	    ResultSet catRes = catStmt.executeQuery();
- 	    String hrefstring;
+ 	    
+ 	 	//tells display to display all products
+         String hrefstring = "./Browse.jsp?action=setCategoryToDisplay&category=-1";
+         %>
+         <a href=<%=hrefstring %>>All Products</a></br>
+ 	<%
  	    while (catRes.next()) {
  	    	hrefstring = "./Browse.jsp?action=setCategoryToDisplay" + "&category=" + catRes.getInt("id");
  	%>
@@ -63,74 +68,80 @@
  	    }
  	%>
  	
-	
-	</br>
-	<table name=table_Products border="1">
-	
-		<tr>
-			<th>Product</th>
-			<th>SKU</th>
-			<th>Price</th>
-			<th>
-		</tr>
-		
-	<!-- ////////////////////////////////////////Search Code/////////////////////////////////////////// -->
+ 	<%-- //////////Display products based on search parameter /////// --%>
+ 	
 	<%
-	
 		String action = request.getParameter("action");
-		if (action != null && action.equals("search")) {
-			
-			Integer categoryid = Integer.parseInt(request.getParameter("select_category"));
-		
-			conn.setAutoCommit(false);
-			
-			PreparedStatement searchStmt = conn.prepareStatement("SELECT * FROM " + 
-					"product WHERE category=?");	
-			
-			searchStmt.setInt(1, categoryid);
-			ResultSet prod = searchStmt.executeQuery();
-		
-	%>
 	
-	<!--///// Iteration Code /////-->
-	<%
-			while(prod.next()) {
-			
-				Integer prodId = prod.getInt("id");
-				String prodName = prod.getString("name");
-				String prodSKU = prod.getString("sku");
-				Integer prodPrice = prod.getInt("price");
-	%>
-		<tr>
-			<form method>
-				<td><input name="prodName" value="<%= prodName %>" /></td>		
-				<td><input name="prodSKU" value="<%= prodSKU %>" /></td>
-				<td><input name="prodPrice" value="<%= prodPrice %>" /></td>
-				<input type="hidden" name="prodId" value=<%= prodId %> />
-				<input type="hidden" name="action" value="buy">
-				<td><input type="submit" value="Add to Cart"/></td>
-			</form>
-		</tr>
-		
-	<% 		
-			} 
-			searchStmt.close();
-			prod.close();
-		}
-		
-	%>
+		//When someone clicks on a category link
+ 	    if (action != null && action.equals("setCategoryToDisplay")) {
+ 	    	session.setAttribute("categoryToDisplay", request.getParameter("category"));
+ 	        session.setAttribute("searchStringToDisplay", null);
+ 	    }
 	
-	<!-- /////////////////////////////////////Insertion Code////////////////////////////////////////// -->
+		//When someone uses the search bar
+ 	    if (action != null && action.equals("setSearchStringToDisplay")) {
+ 	    	if (request.getParameter("searchstring") != null) {
+ 	        	session.setAttribute("searchStringToDisplay", request.getParameter("searchstring"));
+ 	        }
+ 	    }
+ 	            
+ 	            
+ 	    String categoryFilter = (String) session.getAttribute("categoryToDisplay");
+ 	    String searchFilter = (String) session.getAttribute("searchStringToDisplay");
+ 	    ResultSet searchResults = null;
+ 	    
+ 	    if (categoryFilter != null || searchFilter != null) {
+ 	    	
+ 	        // if at least one of these is not null, we can display some stuff
+ 	        if (searchFilter == null) {
+ 	        	searchFilter = "";
+ 	        }
+ 	       
+ 	        PreparedStatement searchQuery = null;
+ 	  		// decide what to query!
+ 	  				
+ 	  		//case when we need to display products without category
+ 	        if (categoryFilter == null || categoryFilter.equals("-1")) {
+ 	        	System.out.println("Executing search only query");
+ 	 	        searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE product.name LIKE '%" + searchFilter + "%'");
+ 	            searchResults = searchQuery.executeQuery();
+ 	        } 
+ 	  		
+ 	        //case when we need to search based on category and search string
+ 	        else if (searchFilter != null){
+ 	        	System.out.println("Executing category AND search query");
+ 	           	System.out.println("categoryFilter: " + categoryFilter);
+ 	           	System.out.println("searchFilter: " + searchFilter);
+ 	           	searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE category = " + categoryFilter + " AND product.name LIKE '%" + searchFilter + "%'");
+ 	            searchResults = searchQuery.executeQuery();
+ 	        }
+ 	    }
+ 	            
+ 	   		if (searchResults != null) {
+      %>
+
+ 	        <!-- Add an HTML table header row to format the results -->
+ 	        </br>
+ 	        <table border="1">
+ 	        	<tr>
+ 	            	<th>Name</th>
+ 	                <th>Sku</th>
+ 	                <th>Price</th>
+ 	                <th>Category</th>               
+ 	            </tr>
+ 	            
+ 	       	<!-- /////////////////Insertion Code///////////////////// -->
 	<%
 		
 		if (action != null && action.equals("buy")) {
 				
 			System.out.println("Got into buy");
 				
-			Integer productId = Integer.parseInt(request.getParameter("prodId"));
-			String productName = request.getParameter("prodName");
-			String productSKU = request.getParameter("prodSKU");
-			Integer productPrice = Integer.parseInt(request.getParameter("prodPrice"));
+			Integer productId = Integer.parseInt(request.getParameter("productid"));
+			String productName = request.getParameter("name");
+			String productSKU = request.getParameter("sku");
+			Integer productPrice = Integer.parseInt(request.getParameter("price"));
 				
 			session.setAttribute("productId", productId);
 			session.setAttribute("productName", productName);
@@ -140,9 +151,53 @@
 			response.sendRedirect("Cart.jsp");
 		}
 	%>	
+
+ 	            <%-- -------- Iteration Code -------- --%>
+ 	            <%
+ 	       		// get all categories
+              	catStmt = conn.prepareStatement("SELECT * FROM category", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+              	catRes = catStmt.executeQuery();
+              	
+ 	            String categoryName = "";
+ 	            while (searchResults.next()) {
+ 	            		
+ 	           		int productid = searchResults.getInt("id");
+	                String name = searchResults.getString("name");
+	                String sku = searchResults.getString("sku");
+	                double price = searchResults.getDouble("price");
+	                int categoryid = searchResults.getInt("category"); 	           	
+	                	
+	                // get the category name (very helpful)
+	                categoryName = searchResults.getString("cname");
+	                System.out.println("categoryName: " + categoryName);
+	            %>
+	 	 	    <tr>
+	 	 	    	<form method="post">
+	 	 	        	
+	 	 	            <td><input name="name" value="<%=name%>"/></td>
+	 	 	            <td><input name="sku" value="<%=sku%>"/></td>
+	 	 	            <td><input name="price" value="<%=price%>"/></td>
+	 	 	                    
+	 	 	            <input type="hidden" name="productid" value="<%=productid%>"/>
+	 	 	            <input type="hidden" name="action" value="buy"/>  
+	 	 	                  
+	 	 	            <%-- Button --%>
+	 	 	            <td><input type="submit" value="Add to Cart"></td>
+	 	 	        </form>
+
+	 	 	    </tr>
+	 	 	           
+	 	 	        <% 
+	 	 	        catRes.beforeFirst();
+ 	            	} %>
+ 	         
+ 	            	</table>
+ 	            <% 
+            	} 
+            	%>
+ 	  
 	
-	</table>
-	
+	</br>
 	
  	<!-- ///////////////////////////////////Close connection code/////////////////////////////////////// -->
 	

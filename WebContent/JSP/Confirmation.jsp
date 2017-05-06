@@ -9,6 +9,8 @@
 <body>
 
 	<a href="Home.jsp">Home</a> </br>
+	<a href="Browse.jsp">Browse Products</a> </br>
+	
 	
 	<h2>Thank you for your purchase</h2>
 
