@@ -260,7 +260,10 @@
  	            <%
  	            Statement stmt = conn.createStatement();
  	            rsTemp2 = stmt.executeQuery("SELECT * from category");
- 	            String hrefstring;
+ 	            String hrefstring = "./Products.jsp?action=setCategoryToDisplay&category=-1";
+ 	            %>
+ 	            </br><a href=<%=hrefstring %>>All Products</a>
+ 	            <%
  	            while (rsTemp2.next()) {
  	            	hrefstring = "./Products.jsp?action=setCategoryToDisplay" + "&category=" + rsTemp2.getInt("id");
  	            %>
@@ -293,7 +296,8 @@
  	            	}
  	       
  	            	PreparedStatement searchQuery = null;
- 	            	if (categoryFilter == null) {
+ 	  
+ 	            	if (categoryFilter == null || categoryFilter.equals("-1")) {
  	            		System.out.println("Executing search only query");
  	 	            	searchQuery = conn.prepareStatement("SELECT product.*, category.name AS cname FROM product JOIN category ON product.category = category.id WHERE product.name LIKE '%" + searchFilter + "%'");
  	            		searchResults = searchQuery.executeQuery();
@@ -407,7 +411,6 @@
  	                // Wrap the SQL exception in a runtime exception to propagate
  	                // it upwards
  	                %>Failed to insert new product.<%
- 	                throw new RuntimeException(e);
  	               
  	            } finally {
  	                // Release resources in a finally block in reverse-order of
