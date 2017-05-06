@@ -50,7 +50,7 @@ public class Servlet_SignUp extends HttpServlet {
 		//retrieve the user's sign up information
 		String user = request.getParameter("input_userName");
 		int age = Integer.parseInt(request.getParameter("input_age"));
-		int state = Integer.parseInt(request.getParameter("select_state"));
+		String state = request.getParameter("select_state");
 		int role = Integer.parseInt(request.getParameter("select_role"));
 		
 		/*
@@ -110,7 +110,7 @@ public class Servlet_SignUp extends HttpServlet {
 				
 				postStmt.setString(1, user);
 				postStmt.setInt(2,age);
-				postStmt.setInt(3, state);
+				postStmt.setString(3, state);
 				postStmt.setInt(4, role);
 				postStmt.executeUpdate();
 				response.sendRedirect("Success_SignUp.jsp");

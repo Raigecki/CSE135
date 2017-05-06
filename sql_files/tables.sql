@@ -2,7 +2,7 @@ CREATE TABLE usert (
   id        SERIAL PRIMARY KEY,
   name      TEXT NOT NULL,
   age       INTEGER NOT NULL,
-  state     INTEGER NOT NULL,
+  state     TEXT NOT NULL,
   role      INTEGER NOT NULL,
   category  INTEGER REFERENCES category,
 );

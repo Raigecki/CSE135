@@ -264,6 +264,7 @@
  	            //tells display to display all products
  	            String hrefstring = "./Products.jsp?action=setCategoryToDisplay&category=-1";
  	            %>
+ 	            </br><b>Categories</b>
  	            </br><a href=<%=hrefstring %>>All Products</a>
  	            <%
  	            while (rsTemp2.next()) {

@@ -1,0 +1,16 @@
+Assumptions
+
+Page requirements to actual file names
+
+The Signup page is file: 			SignUp.jsp
+The Login page is file: 			index.jsp
+The Home page is file: 				Home.jsp
+The Categories page is file: 		Categories.jsp
+The Products page is file: 			Products.jsp
+The Products Browsing page is file: Browse.jsp
+The Product Order page is file: 	Cart.jsp
+The Buy Shopping Cart page is file: Buy.jsp
+The Confirmation page is file: 		Confirmation.jsp
+
+We assume that while owners cannot modify other owners' categories, they CAN modify other owners' products.
+
