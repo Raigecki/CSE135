@@ -53,10 +53,12 @@ public class Servlet_SignUp extends HttpServlet {
 		int state = Integer.parseInt(request.getParameter("select_state"));
 		int role = Integer.parseInt(request.getParameter("select_role"));
 		
+		/*
 		System.out.println(user);
 		System.out.println(age);
 		System.out.println(state);
 		System.out.println(role);
+		*/
 
 		Connection conn;
 		try {
@@ -113,6 +115,10 @@ public class Servlet_SignUp extends HttpServlet {
 				postStmt.executeQuery();
 				response.sendRedirect("Success_SignUp.jsp");
 			}
+			
+			verifyStmt.close();
+			postStmt.close();
+			conn.close();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

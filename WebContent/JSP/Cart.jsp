@@ -34,11 +34,12 @@
 			Integer productPrice = (Integer) session.getAttribute("productPrice");
 			Integer productId = (Integer) session.getAttribute("productId");
 			
+			/*
 			System.out.println(productName);
 			System.out.println(productSKU);
 			System.out.println(productPrice);
 			System.out.println(productId);
-			
+			*/
 			
 			//Get information for the current shopping cart
 			Integer userId = (Integer) session.getAttribute("userid");
@@ -80,6 +81,8 @@
 	<!-- ////////////////////////////Update Code /////////////////////////////// -->
 	<%
 	
+			//Code for when the user wants to confirm item to cart
+			
 			String action = request.getParameter("action");
 			
 			if (action != null && action.equals("add")) {
@@ -100,6 +103,8 @@
 				
 				conn.commit();
 				conn.setAutoCommit(true);
+				
+				insStmt.close();
 				
 				response.sendRedirect("Browse.jsp");
 			}
@@ -145,8 +150,9 @@
 	<!--//////////////////// Close Connection Code //////////////////// -->
 	<%
 	
+			getStmt.close();
+			cartItem.close();
 			conn.close();
-	
 		} 
 		catch(Exception e) {
 			e.printStackTrace();

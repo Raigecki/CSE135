@@ -35,10 +35,12 @@
 			PreparedStatement delStmt = conn.prepareStatement("DELETE FROM " +
 					" cart WHERE id =?");
 			delStmt.setInt(1, cartId);
+			int res = delStmt.executeUpdate();
 	
 	
 	%>
 	<%
+			delStmt.close();
 			conn.close();
 			//result.close();
 		} catch (Exception e) {

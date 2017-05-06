@@ -65,8 +65,8 @@
 					response.sendRedirect("Confirmation.jsp");
 				}			
 			}
-			
-			
+			reStmt.close();
+			idCart.close();
 	%>
 	
 	</br>
@@ -110,6 +110,8 @@
 	<!--//////////////////// Close Connection Code //////////////////// -->
 	<%
 	
+			getStmt.close();
+			cartItem.close();
 			conn.close();
 	
 		} 
