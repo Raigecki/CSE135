@@ -156,8 +156,16 @@
 
  	                    	// Commit transaction
  	                    	conn.commit();
+ 	                    	
+ 	                    	pstmt = conn.prepareStatement("UPDATE incategory SET category = ? WHERE product = ?");
+ 	                    	pstmt.setInt(1, category);
+ 	                    	pstmt.setInt(2, Integer.parseInt(request.getParameter("productid")));
+ 	                    	pstmt.executeUpdate();
+ 	                    	conn.commit();
+ 	                    	
  	                    	conn.setAutoCommit(true);
 						}
+						%>Product successfully updated<%
  	                }
  	            %>
  	            
@@ -175,10 +183,18 @@
  	                        .prepareStatement("DELETE FROM product WHERE id = ?");
 
  	                    pstmt.setInt(1, Integer.parseInt(request.getParameter("productid")));
+ 	                    pstmt.executeUpdate();
  	                   
  	                    // Commit transaction
  	                   	conn.commit();
+ 	             
+ 	                    pstmt = conn.prepareStatement("DELETE FROM incategory WHERE product = ?");
+ 	                    pstmt.setInt(1, Integer.parseInt(request.getParameter("productid")));
+ 	                    pstmt.executeUpdate();
+ 	                    conn.commit();
+ 	                    
  	                    conn.setAutoCommit(true);
+ 	                    %>Successfully deleted product.<%
 			
  	                }
  	            %>
@@ -312,7 +328,7 @@
  	 	            String categoryName = "";
  	 	            	while (searchResults.next()) {
  	 	           			index++;
- 	 	           			int id = searchResults.getInt("id");
+ 	 	           			int productid = searchResults.getInt("id");
 	 	                	String name = searchResults.getString("name");
 	 	                	String sku = searchResults.getString("sku");
 	 	                	double price = searchResults.getDouble("price");
@@ -350,7 +366,7 @@
 	 	 	 	                    }
 	 	 	 	                    %>
 	 	 	 	                    </select></td>
-	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+	 	 	 	                    <input type="hidden" name="productid" value="<%=productid%>"/>
 	 	 	 	                    
 	 	 	 	                <%-- Button --%>
 	 	 	 	                <td><input type="submit" value="Update"></td>
@@ -358,7 +374,7 @@
 
 	 	 	 	                <form action="./Products.jsp" method="POST">
 	 	 	 	                    <input type="hidden" name="action" value="delete"/>
-	 	 	 	                    <input type="hidden" name="id" value="<%=id%>"/>
+	 	 	 	                    <input type="hidden" name="productid" value="<%=productid%>"/>
 	 	 	 	                    <%-- Button --%>
 	 	 	 	                <td><input type="submit" value="Delete"/></td>
 	 	 	 	                </form>
